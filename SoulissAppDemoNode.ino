@@ -4,21 +4,23 @@
 	demo node shown in soulissApp
 
 	Refer to Souliss Wiki to know about souliss framework APIs and functions used below
-
+	tested w/ souliss v7.2-beta.1 and arduino 1.8.10
+	on Olimex ESP8266EVB boards
 
 	shine@angelic.it
 	11/2019
 
 ***************************************************************************/
 
-// Configure the framework
 
 
+//DHT is actually optional and enables real sensor readings
 #include "DHT.h"
 #define DHTTYPE DHT22   // DHT 22  (AM2302), AM2321
 #define DHTPIN 11
 DHT dht(DHTPIN, DHTTYPE);
 
+// Configure the framework
 #include <SoulissFramework.h>
 
 #include "bconf/Olimex_ESP8266EVB.h"    // Load the code directly on the ESP8266
@@ -41,14 +43,14 @@ DHT dht(DHTPIN, DHTTYPE);
 // This identify theonly real device (relay)
 #define RELAY_PIN           5
 
-// This identify the number of the LED logic
+// SLOTs (fake, test purposes)
 #define MYLEDLOGIC				0 
-#define USED_SLOT1_N1          1
-#define USED_SLOT3_N1          3
-#define USED_SLOT5_N1          5
-#define USED_SLOT7_N1          7
-#define HUM						9               // Leave 2 slots for T58
-#define TEMP0                 11               // Leave 2 slots for T52
+#define USED_SLOT1_N1			1
+#define USED_SLOT3_N1			3
+#define USED_SLOT5_N1			5
+#define USED_SLOT7_N1			7
+#define HUM						9// Leave 2 slots for T58
+#define TEMP0					11// Leave 2 slots for T52
 #define USED_SLOT13_N1          13
 
 void setup()
@@ -66,7 +68,7 @@ void setup()
 	// This node will serve all the others in the network providing an address
 	SetAddressingServer();
 
-	Set_T14(MYLEDLOGIC);        // Define a simple LED light logic
+	Set_T14(MYLEDLOGIC);
 	Set_T12(USED_SLOT1_N1);
 	Set_T32(USED_SLOT3_N1);
 	Set_T16(USED_SLOT5_N1);
@@ -81,11 +83,13 @@ void loop()
 {
 	// Here we start to play
 	EXECUTEFAST() {
+
+
 		UPDATEFAST();
 
 		FAST_50ms() {   // We process the logic and relevant input and output every 50 milliseconds
-			//DigIn(IN0, Souliss_T1n_ToggleCmd, MYLEDLOGIC);
 			Logic_T14(MYLEDLOGIC);
+			//only 'real' device
 			DigOut(RELAY_PIN, Souliss_T1n_Coil, MYLEDLOGIC);
 		}
 
