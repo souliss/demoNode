@@ -5,7 +5,7 @@
 
 	Refer to Souliss Wiki to know about souliss framework APIs and functions used below
 	tested w/ souliss v7.2-beta.1 and arduino 1.8.10
-	on Olimex ESP8266EVB boards
+	on Olimex ESP8266EVB boards, using Visual Studio community edition 2019
 
 	shine@angelic.it
 	11/2019
@@ -15,6 +15,7 @@
 
 
 //DHT is actually optional and enables real sensor readings
+#include <GetConfig.h>
 #include "DHT.h"
 #define DHTTYPE DHT22   // DHT 22  (AM2302), AM2321
 #define DHTPIN 11
@@ -49,15 +50,14 @@ DHT dht(DHTPIN, DHTTYPE);
 #define USED_SLOT3_N1			3
 #define USED_SLOT5_N1			5
 #define USED_SLOT7_N1			7
-#define HUM						9// Leave 2 slots for T58
-#define TEMP0					11// Leave 2 slots for T52
+#define HUM						9// Leave 2 slots for sensor
+#define TEMP0					11// Leave 2 slots for sensor
 #define USED_SLOT13_N1          13
 
 void setup()
 {
 	Serial.begin(115200);
 	Initialize();
-	//dht.begin();
 
 	// Connect to the WiFi network and get an address from DHCP
 	GetIPAddress();
@@ -84,12 +84,11 @@ void loop()
 	// Here we start to play
 	EXECUTEFAST() {
 
-
 		UPDATEFAST();
 
 		FAST_50ms() {   // We process the logic and relevant input and output every 50 milliseconds
 			Logic_T14(MYLEDLOGIC);
-			//only 'real' device
+			//only one 'real' device
 			DigOut(RELAY_PIN, Souliss_T1n_Coil, MYLEDLOGIC);
 		}
 
@@ -99,9 +98,10 @@ void loop()
 			Logic_T16(USED_SLOT5_N1);
 			Logic_T15(USED_SLOT7_N1);
 			Logic_T19(USED_SLOT13_N1);
+			Logi
 		}
 
-		// Here we handle here the communication with Android
+		// Here we handle communications
 		FAST_GatewayComms();
 	}
 	EXECUTESLOW()
@@ -111,6 +111,7 @@ void loop()
 		SLOW_10s() {
 			Logic_Humidity(HUM);
 			Logic_Temperature(TEMP0);
+
 		}
 
 		SLOW_50s() {
